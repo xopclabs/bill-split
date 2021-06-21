@@ -1,10 +1,10 @@
 #+TITLE: bill-split
 
-``bill-split`` is a cli application application I wrote to split the multiple bills between a small group of people.
+=bill-split= is a cli application application I wrote to split the multiple bills between a small group of people.
 
 Application prompts to enter the names of people sharing the bills, item list and who and in which quantity gets each item. After all data is entered, all needed transactions are computed and displayed in the console.
 
-``bill-split`` accounts for cases when some items are bought for multiple people (e.g. a pizza) and when something is bought for one person only (e.g a soda can).
+=bill-split= accounts for cases when some items are bought for multiple people (e.g. a pizza) and when something is bought for one person only (e.g a soda can).
 
 ** Features
 + Good-ish UX for entering items involving names aliases
