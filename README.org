@@ -23,7 +23,7 @@ Application prompts to enter the names of people sharing the bills, item list an
 + [ ] Saving/restoring data to/from local storage
 + [-] Text user interface
   - [X] Entering names
-  - [ ] Creating flexible layout for shopping cart window
-  - [ ] Entering items in shopping cart
+  - [X] Creating flexible layout for shopping cart window
+  - [-] Entering items in shopping cart
   - [ ] Entering amount each person has paid
   - [ ] Displaying transactions
