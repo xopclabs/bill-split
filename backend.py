@@ -5,7 +5,7 @@ import pandas as pd
 class Splitter:
 
     def __init__(self, names):
-        self.names = names.split()
+        self.names = names
         self.shopping_cart = pd.DataFrame(columns=['name', 'price'] + self.names)
         self.transactions = pd.DataFrame(columns=['from', 'to', 'amount']
                                           + [s + '_debt' for s in self.names]
