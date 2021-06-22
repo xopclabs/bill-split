@@ -7,9 +7,9 @@ class CustomPyCUI(py_cui.PyCUI):
     def __init__(self, arg1, arg2):
         super(CustomPyCUI, self).__init__(arg1, arg2)
 
-    def add_scroll_menu_no_hotkeys(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0):
+    def add_linked_scroll_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0):
         id = 'Widget{}'.format(len(self.widgets.keys()))
-        new_scrollmenu = ScrollMenuNoHotkeys(id, title,  self.grid, row, column, row_span, column_span, padx, pady, book)
+        new_scrollmenu = LinkedScrollMenu(id, title,  self.grid, row, column, row_span, column_span, padx, pady, book)
         self.widgets[id] = new_scrollmenu
         if self.selected_widget is None:
             self.set_selected_widget(id)
@@ -69,20 +69,29 @@ class CustomWidgetSet(py_cui.widget_set.WidgetSet):
         self._selected_widget = None
         self._logger = logger
 
-    def add_scroll_menu_no_hotkeys(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0):
+    def add_linked_scroll_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0):
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_scrollmenu = ScrollMenuNoHotkeys(id, title,  self._grid, row, column, row_span, column_span, padx, pady, self._logger)
+        new_scrollmenu = LinkedScrollMenu(id, title,  self._grid, row, column, row_span, column_span, padx, pady, self._logger)
         self._widgets[id] = new_scrollmenu
         if self._selected_widget is None:
             self.set_selected_widget(id)
         return new_scrollmenu
 
+    def get_selected_widget(self):
+        if self._selected_widget is not None and self._selected_widget in self.get_widgets().keys():
+            return self.get_widgets()[self._selected_widget]
+        else:
+            self._logger.warn('Selected widget ID is None or invalid')
+            return None
 
-class ScrollMenuNoHotkeys(py_cui.widgets.ScrollMenu):
+class LinkedScrollMenu(py_cui.widgets.ScrollMenu):
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger):
-        super(ScrollMenuNoHotkeys, self).__init__(id, title, grid, row, column, row_span, column_span, padx, pady, logger)
+        super(LinkedScrollMenu, self).__init__(id, title, grid, row, column, row_span, column_span, padx, pady, logger)
         self.links = []
         self.navkeys = py_cui.keys.ARROW_KEYS + [py_cui.keys.KEY_J_LOWER, py_cui.keys.KEY_K_LOWER]
+
+    def get_title(self):
+        return self._title
 
     def add_link(self, menus):
         self.links = menus
@@ -109,4 +118,4 @@ class ScrollMenuNoHotkeys(py_cui.widgets.ScrollMenu):
 
     def _handle_mouse_press(self, x, y):
         for menu in self.links:
-            py_cui.widgets.ScrollMenu._handle_mouse_press(x, y)
+            py_cui.widgets.ScrollMenu._handle_mouse_press(menu, x, y)

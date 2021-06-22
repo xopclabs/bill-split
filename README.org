@@ -25,5 +25,8 @@ Application prompts to enter the names of people sharing the bills, item list an
   - [X] Entering names
   - [X] Creating flexible layout for shopping cart window
   - [-] Entering items in shopping cart
+    + [X] Basic table interactions
+    + [ ] Add hotkeys to change focus between linked scrollmenus
+    + [ ] Copy item name into textbox popup for editing
   - [ ] Entering amount each person has paid
   - [ ] Displaying transactions
