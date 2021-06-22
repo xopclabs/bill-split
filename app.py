@@ -52,15 +52,17 @@ class SplitterUI:
         self.cart_set.add_key_command(py_cui.keys.KEY_A_LOWER, self.cart_add_item)
         # General settings that apply to every scrollmenu
         for menu in self.cart_scrollmenus.values():
+            # Add link between menus
+            menu.add_link(list(self.cart_scrollmenus.values()))
             # Hotkeys
             menu.add_key_command(py_cui.keys.KEY_DELETE, self.cart_del_item)
             menu.add_key_command(py_cui.keys.KEY_D_LOWER, self.cart_del_item)
 
-            menu.add_key_command(py_cui.keys.KEY_J_LOWER, self.cart_scroll_down)
-            menu.add_key_command(py_cui.keys.KEY_DOWN_ARROW, self.cart_scroll_down)
+            # menu.add_key_command(py_cui.keys.KEY_J_LOWER, self.cart_scroll_down)
+            # menu.add_key_command(py_cui.keys.KEY_DOWN_ARROW, self.cart_scroll_down)
 
-            menu.add_key_command(py_cui.keys.KEY_K_LOWER, self.cart_scroll_up)
-            menu.add_key_command(py_cui.keys.KEY_UP_ARROW, self.cart_scroll_up)
+            # menu.add_key_command(py_cui.keys.KEY_K_LOWER, self.cart_scroll_up)
+            # menu.add_key_command(py_cui.keys.KEY_UP_ARROW, self.cart_scroll_up)
             # Coloring
             menu.set_selected_color(py_cui.WHITE_ON_GREEN)
         # Specific hotkeys

@@ -1,4 +1,5 @@
 import py_cui
+from py_cui.widgets import ScrollMenu
 import shutil
 
 
@@ -78,17 +79,34 @@ class CustomWidgetSet(py_cui.widget_set.WidgetSet):
 
 
 class ScrollMenuNoHotkeys(py_cui.widgets.ScrollMenu):
-    # def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, join_to):
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger):
         super(ScrollMenuNoHotkeys, self).__init__(id, title, grid, row, column, row_span, column_span, padx, pady, logger)
-        # self.join_to = join_to
+        self.links = []
+        self.navkeys = py_cui.keys.ARROW_KEYS + [py_cui.keys.KEY_J_LOWER, py_cui.keys.KEY_K_LOWER]
+
+    def add_link(self, menus):
+        self.links = menus
+
 
     def _handle_key_press(self, key_pressed):
-        py_cui.widgets.Widget._handle_key_press(self, key_pressed)
-        # for menu in self.join_with:
-        #     py_cui.widgets.Widget._handle_key_press(menu, key_pressed)
+        def _handle_vim_arrows(menu, key_pressed):
+            if key_pressed == py_cui.keys.KEY_J_LOWER:
+                viewport_height = menu.get_viewport_height()
+                menu._scroll_down(viewport_height)
+            elif key_pressed == py_cui.keys.KEY_K_LOWER:
+                menu._scroll_up()
+
+        py_cui.widgets.ScrollMenu._handle_key_press(self, key_pressed)
+        _handle_vim_arrows(self, key_pressed)
+        for menu in self.links:
+            # Skip self
+            if menu == self:
+                continue
+            # If navkeys pressed, translate motion to linked menus
+            if key_pressed in self.navkeys:
+                py_cui.widgets.ScrollMenu._handle_key_press(menu, key_pressed)
+                _handle_vim_arrows(menu, key_pressed)
 
     def _handle_mouse_press(self, x, y):
-        py_cui.widgets.Widget._handle_mouse_press(self, x, y)
-        # for menu in self.join_with:
-        #     py_cui.widgets.Widget._handle_mouse_press(menu, x, y)
+        for menu in self.links:
+            py_cui.widgets.ScrollMenu._handle_mouse_press(x, y)
