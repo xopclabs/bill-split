@@ -1,11 +1,11 @@
 import py_cui
 import logging
 from backend import Splitter
+from custom_py_cui import *
 
 
 class SplitterUI:
-
-    def __init__(self, root: py_cui.PyCUI):
+    def __init__(self, root: CustomPyCUI):
         self.root = root
         self.root.set_title('bill-split | People')
 
@@ -35,7 +35,7 @@ class SplitterUI:
         self.splitter = Splitter(names)
 
         # Create new widget set for next screen
-        self.cart_set = self.root.create_new_widget_set(7, 3 + len(names))
+        self.cart_set = self.root.create_new_custom_widget_set(7, 3 + len(names))
 
         # Add labels for each name
         self.cart_names_labels = {}
@@ -44,15 +44,15 @@ class SplitterUI:
 
         # Add scrollmenus for items, prices and quantities
         self.cart_scrollmenus = {}
-        self.cart_scrollmenus['item'] = self.cart_set.add_scroll_menu('Item', 1, 0, row_span=5, column_span=2)
-        self.cart_scrollmenus['price'] = self.cart_set.add_scroll_menu('Price', 1, 2, row_span=5, column_span=1)
+        self.cart_scrollmenus['item'] = self.cart_set.add_scroll_menu_no_hotkeys('Item', 1, 0, row_span=5, column_span=2)
+        self.cart_scrollmenus['price'] = self.cart_set.add_scroll_menu_no_hotkeys('Price', 1, 2, row_span=5, column_span=1)
         for i, name in enumerate(self.splitter.names):
-            self.cart_scrollmenus[name] = self.cart_set.add_scroll_menu(name, 1, 3 + i, row_span=5, column_span=1)
+            self.cart_scrollmenus[name] = self.cart_set.add_scroll_menu_no_hotkeys(name, 1, 3 + i, row_span=5, column_span=1)
+        # Add item hotkey
+        self.cart_set.add_key_command(py_cui.keys.KEY_A_LOWER, self.cart_add_item)
         # General settings that apply to every scrollmenu
         for menu in self.cart_scrollmenus.values():
             # Hotkeys
-            menu.add_key_command(py_cui.keys.KEY_A_LOWER, self.cart_add_item)
-
             menu.add_key_command(py_cui.keys.KEY_DELETE, self.cart_del_item)
             menu.add_key_command(py_cui.keys.KEY_D_LOWER, self.cart_del_item)
 
@@ -73,7 +73,7 @@ class SplitterUI:
         self.root.set_title('bill-split | Shopping cart')
 
         # Change screen to shopping cart editing screen
-        self.root.apply_widget_set(self.cart_set)
+        self.root.apply_custom_widget_set(self.cart_set)
 
     def cart_add_item(self):
         def add_item(text):
@@ -112,7 +112,7 @@ class SplitterUI:
 
 
 if __name__ == '__main__':
-    root = py_cui.PyCUI(5, 20)
+    root = CustomPyCUI(5, 20)
     root.enable_logging(logging_level=logging.DEBUG)
     root.toggle_unicode_borders()
     ui = SplitterUI(root)
