@@ -24,7 +24,7 @@ class SplitterUI:
         person = str(self.people_textbox.get()).strip()
         # Show error popup if entering duplicate
         if person in self.people_scrollmenu.get_item_list():
-            self.root.show_error_popup('Invalid name', 'All names must be unique.')
+            self.root.show_error_popup('Invalid name', 'All names must be unique!')
             self.people_textbox.clear()
             return
         # Validation
@@ -78,8 +78,8 @@ class SplitterUI:
         self.cart_set.add_key_command(py_cui.keys.KEY_C_LOWER, self.cart_change)
         self.cart_set.add_key_command(py_cui.keys.KEY_D_LOWER, self.cart_del_item)
 
-        self.cart_set.add_key_command(py_cui.keys.KEY_J_LOWER, self.cart_scroll_up)
-        self.cart_set.add_key_command(py_cui.keys.KEY_K_LOWER, self.cart_scroll_down)
+        self.cart_set.add_key_command(py_cui.keys.KEY_K_LOWER, self.cart_scroll_up)
+        self.cart_set.add_key_command(py_cui.keys.KEY_J_LOWER, self.cart_scroll_down)
 
         # Change title
         self.root.set_title('bill-split | Shopping cart')
@@ -122,7 +122,19 @@ class SplitterUI:
 
     def cart_change(self):
         def change(text):
-            widget.set_selected_item(str(text).strip())
+            text = text.strip()
+            # Updating data in dataframe
+            idx = widget.get_selected_item_index()
+            row = self.splitter.shopping_cart.iloc[idx].to_dict()
+            row[widget.get_title()] = float(text)
+            self.splitter.change_item(idx, row)
+            # Tinkering with casting for better visual appeal
+            if '.' in text:
+                text = float(text)
+            else:
+                text = int(text)
+            # Updating data visually
+            widget.set_selected_item(text)
 
         widget = self.root.get_selected_widget()
         try:
@@ -136,7 +148,25 @@ class SplitterUI:
             print(e)
 
     def _change_entry(self, key, text):
+        # Getting scrollmenu from dict
         menu = self.cart_scrollmenus[key]
+        # Updating data in dataframe
+        idx = menu.get_selected_item_index()
+        row = self.splitter.shopping_cart.iloc[idx].to_dict()
+        if key == 'item':
+            if text != '':
+                row['name'] = text
+            else:
+                self.root.show_error_popup('Invalid name', 'Name should not be empty!')
+                return
+        elif key == 'price':
+            try:
+                row['price'] = float(text)
+            except ValueError:
+                self.root.show_error_popup('Invalid price', 'Price should be a number!')
+                return
+        self.splitter.change_item(idx, row)
+        # Updating data visually
         menu.set_selected_item(str(text).strip())
 
     def cart_change_item(self):
@@ -149,7 +179,7 @@ class SplitterUI:
         # Creating return dictionary
         parsed_entry = {'name': 'Unnamed', 'price': 0.0}
         parsed_entry.update(dict(zip(self.splitter.names,
-                                     [1, ]*len(self.splitter.names))))
+                                     [0, ]*len(self.splitter.names))))
         # Parsing
         entry = entry.strip().split()
         if entry == []:
