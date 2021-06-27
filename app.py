@@ -56,15 +56,11 @@ class SplitterUI:
             # Add link between menus
             menu.add_link(list(self.cart_scrollmenus.values()))
             # Hotkeys
-            menu.add_key_command(py_cui.keys.KEY_DELETE, self.cart_del_item)
-            menu.add_key_command(py_cui.keys.KEY_D_LOWER, self.cart_del_item)
+            menu.add_key_command(py_cui.keys.KEY_DELETE, menu.remove_selected_item)
+            menu.add_key_command(py_cui.keys.KEY_D_LOWER, menu.remove_selected_item)
+            menu.add_key_command(py_cui.keys.KEY_C_LOWER, self.cart_change)
             # Coloring
             menu.set_selected_color(py_cui.WHITE_ON_GREEN)
-        # Specific hotkeys
-        # self.cart_scrollmenus['item'].add_key_command(py_cui.keys.KEY_C_LOWER, self.cart_change_item)
-        # self.cart_scrollmenus['price'].add_key_command(py_cui.keys.KEY_C_LOWER, self.cart_change_price)
-        # for name in self.splitter.names:
-        #     menu.add_key_command(py_cui.keys.KEY_C_LOWER, lambda: self.cart_change_quantity(name))
 
         # Add button perpesenting personal sum for each person
         self.cart_sum_buttons = {}
@@ -78,14 +74,27 @@ class SplitterUI:
             self.cart_paid_textboxes[name] = self.cart_set.add_text_box(text, 6, 3 + i)
 
         # Adding global change hotkey
+        self.cart_set.add_key_command(py_cui.keys.KEY_A_LOWER, self.cart_add_item)
         self.cart_set.add_key_command(py_cui.keys.KEY_C_LOWER, self.cart_change)
-        self.cart_set.add_key_command(py_cui.keys.KEY_T_LOWER, lambda: self.cart_set.set_selected_widget(self.cart_scrollmenus['price']))
+        self.cart_set.add_key_command(py_cui.keys.KEY_D_LOWER, self.cart_del_item)
+
+        self.cart_set.add_key_command(py_cui.keys.KEY_J_LOWER, self.cart_scroll_up)
+        self.cart_set.add_key_command(py_cui.keys.KEY_K_LOWER, self.cart_scroll_down)
 
         # Change title
         self.root.set_title('bill-split | Shopping cart')
 
         # Change screen to shopping cart editing screen
         self.root.apply_custom_widget_set(self.cart_set)
+
+    def cart_scroll_up(self):
+        for menu in self.cart_scrollmenus.values():
+            menu._scroll_up()
+
+    def cart_scroll_down(self):
+        viewport_height = self.cart_scrollmenus['item'].get_viewport_height()
+        for menu in self.cart_scrollmenus.values():
+            menu._scroll_down(viewport_height)
 
     def cart_add_item(self):
         def add_item(text):
@@ -97,8 +106,11 @@ class SplitterUI:
         self.root.show_text_box_popup('Enter item name (and optionally, price and people buying it)', add_item)
 
     def cart_del_item(self):
-        for menu in self.cart_scrollmenus.values():
-            menu.remove_selected_item()
+        widget = self.root.get_selected_widget()
+        try:
+            widget.remove_selected_item()
+        except Exception as e:
+            print(e)
 
     def cart_change(self):
         def change(text):

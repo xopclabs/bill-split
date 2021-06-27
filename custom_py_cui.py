@@ -105,12 +105,7 @@ class LinkedScrollMenu(py_cui.widgets.ScrollMenu):
             elif key_pressed == py_cui.keys.KEY_K_LOWER:
                 menu._scroll_up()
 
-        py_cui.widgets.ScrollMenu._handle_key_press(self, key_pressed)
-        _handle_vim_arrows(self, key_pressed)
         for menu in self.links:
-            # Skip self
-            if menu == self:
-                continue
             # If navkeys pressed, translate motion to linked menus
             if key_pressed in self.navkeys:
                 py_cui.widgets.ScrollMenu._handle_key_press(menu, key_pressed)
@@ -119,3 +114,7 @@ class LinkedScrollMenu(py_cui.widgets.ScrollMenu):
     def _handle_mouse_press(self, x, y):
         for menu in self.links:
             py_cui.widgets.ScrollMenu._handle_mouse_press(menu, x, y)
+
+    def remove_selected_item(self):
+        for menu in self.links:
+            py_cui.widgets.ScrollMenu.remove_selected_item(menu)
