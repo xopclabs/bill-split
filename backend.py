@@ -71,6 +71,9 @@ class Splitter:
     def add_item(self, item):
         self.shopping_cart = self.shopping_cart.append(item, ignore_index=True)
 
+    def remove_item(self, idx):
+        self.shopping_cart.drop(index=idx, inplace=True)
+
     def run(self):
         while not self._is_resolved():
             self._compute_transaction()

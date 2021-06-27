@@ -98,17 +98,25 @@ class SplitterUI:
 
     def cart_add_item(self):
         def add_item(text):
-            self.cart_scrollmenus['item'].add_item(text)
-            self.cart_scrollmenus['price'].add_item(str(0.0))
+            # Parse entries
+            parsed_entry = self.parse_entry(text)
+            # Add to dataframe
+            self.splitter.add_item(parsed_entry)
+
+            self.cart_scrollmenus['item'].add_item(parsed_entry['name'])
+            self.cart_scrollmenus['price'].add_item(str(parsed_entry['price']))
             for name in self.splitter.names:
-                self.cart_scrollmenus[name].add_item(str(0))
+                self.cart_scrollmenus[name].add_item(str(parsed_entry[name]))
 
         self.root.show_text_box_popup('Enter item name (and optionally, price and people buying it)', add_item)
 
     def cart_del_item(self):
         widget = self.root.get_selected_widget()
         try:
-            widget.remove_selected_item()
+            if len(widget.get_item_list()) != 0:
+                widget.remove_selected_item()
+                idx = widget.get_selected_item_index()
+                self.splitter.remove_item(idx)
         except Exception as e:
             print(e)
 
@@ -137,6 +145,44 @@ class SplitterUI:
     def cart_change_price(self):
         self.root.show_text_box_popup('Change item price to', lambda text: self._change_entry('price', text))
 
+    def parse_entry(self, entry):
+        # Creating return dictionary
+        parsed_entry = {'name': 'Unnamed', 'price': 0.0}
+        parsed_entry.update(dict(zip(self.splitter.names,
+                                     [1, ]*len(self.splitter.names))))
+        # Parsing
+        entry = entry.strip().split()
+        if entry == []:
+            return parsed_entry
+        # Finding boundary for item name
+        for i, s in enumerate(entry):
+            if s[0].isnumeric():
+                break
+            if i == len(entry) - 1:
+                i = -1
+        # Adding name to dict
+        parsed_entry['name'] = ' '.join(entry[:i])
+        # If only name is provided, return
+        if i == -1:
+            parsed_entry['name'] = ' '.join(entry)
+            return parsed_entry
+        # Adding price to dict
+        parsed_entry['price'] = float(entry[i])
+        # Parsing quantites for each person
+        for i in range(i + 1, len(entry)):
+            # Skipping numbers
+            if entry[i][0].isnumeric():
+                continue
+            # Get person's name
+            person = entry[i]
+            # Get quantity (default to 1 if not specified)
+            if i + 1 < len(entry) and entry[i + 1][0].isnumeric():
+                quantity = float(entry[i + 1])
+            else:
+                quantity = 1
+            # Add item to return dict
+            parsed_entry[person] = quantity
+        return parsed_entry
 
 if __name__ == '__main__':
     root = CustomPyCUI(5, 20)
